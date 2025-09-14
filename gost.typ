@@ -11,6 +11,7 @@
 #let SPACING = 1em
 #let PAGE-NUMBERING = "1"
 #let LONG-DASH = [---]
+#let LIST-DOT = [.]
 #let leading = 1.5em
 #let LEADING = leading - 0.75em // "Normalization"
 #let LIST-INDENT = 0.25cm
@@ -71,6 +72,7 @@
 }
 #show figure.caption.where(kind: table): set align(left)
 #show table.cell: set align(left)
+
 // Списки (ненумерованный и нумерованный)
 #show list: it => {
   set par(justify: true, first-line-indent: (
@@ -98,9 +100,9 @@
   let counter = 0
   for item in it.children {
     if counter == 0 {
-      [#(counter + 1))#h(LIST-INDENT)#item.body]
+      [#(counter + 1)#LIST-DOT#h(LIST-INDENT)#item.body]
     } else {
-      [#h(INDENT)#(counter + 1))#h(LIST-INDENT)#item.body]
+      [#h(INDENT)#(counter + 1)#LIST-DOT#h(LIST-INDENT)#item.body]
     }
     [\ ]
     counter = counter + 1
