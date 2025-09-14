@@ -3,7 +3,7 @@
 // Константы
 #let MARGIN = (left: 30mm, right: 15mm, top: 20mm, bottom: 20mm)
 #let TEXT-SIZE = 14pt
-#let LISTING-ERROR-PAGINATION = 3.4pt
+#let LISTING-ERROR-PAGINATION = 2.9pt
 #let INDENT = 1.25cm
 #let LANG = "ru"
 #let HYPHENATE = false
@@ -59,9 +59,6 @@
 // Нумерация математических формул
 #set math.equation(numbering: "(1)")
 
-// Настройка картинок
-#show figure: pad.with(bottom: 0.5em)
-
 #show image: set align(center)
 #show figure.where(kind: image): set figure(supplement: [Рисунок])
 
@@ -74,8 +71,6 @@
 }
 #show figure.caption.where(kind: table): set align(left)
 #show table.cell: set align(left)
-#show figure: set block(below: LEADING / 10)
-
 // Списки (ненумерованный и нумерованный)
 #show list: it => {
   set par(justify: true, first-line-indent: (
