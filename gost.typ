@@ -249,7 +249,12 @@
       // Добавляем последнюю страницу, если она не пустая
       if current-page.len() > 0 {
         pages.push(current-page)
-        create-listing-table(current-page.join("\n"), is-continuation: true)
+        if pages.len() == 1 {
+          is-continious = false
+        } else {
+          is-continious = true
+        }
+        create-listing-table(current-page.join("\n"), is-continuation: is-continious)
       }
     })
   }
