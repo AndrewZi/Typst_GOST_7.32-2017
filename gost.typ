@@ -1,9 +1,10 @@
 #set text(font: "Times New Roman")
 
 // Константы
+#let START-PAGE = 2
 #let MARGIN = (left: 30mm, right: 15mm, top: 20mm, bottom: 20mm)
 #let TEXT-SIZE = 14pt
-#let LISTING-ERROR-PAGINATION = 2.9pt
+#let LISTING-ERROR-PAGINATION = 2.9pt // подобрано
 #let INDENT = 1.25cm
 #let LANG = "ru"
 #let HYPHENATE = false
@@ -13,7 +14,7 @@
 #let LONG-DASH = [---]
 #let LIST-DOT = [.]
 #let leading = 1.5em
-#let LEADING = leading - 0.75em // "Normalization"
+#let LEADING = leading - 0.75em // Normalization
 #let LIST-INDENT = 0.25cm
 
 // Настройка страницы
@@ -259,3 +260,5 @@
     })
   }
 }
+
+#context(counter(page).update(START-PAGE))
