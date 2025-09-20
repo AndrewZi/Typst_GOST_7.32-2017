@@ -4,12 +4,13 @@
 #let START-PAGE = 2
 #let MARGIN = (left: 30mm, right: 15mm, top: 20mm, bottom: 20mm)
 #let TEXT-SIZE = 14pt
-#let LISTING-ERROR-PAGINATION = 2.9pt // подобрано
+#let LISTING-ERROR-PAGINATION = 0.24em // подобрано для размера шрифта от 13 до 18pt вкл.
 #let INDENT = 1.25cm
 #let LANG = "ru"
 #let HYPHENATE = false
 #let JUSTIFY = true
-#let SPACING = 1em
+#let SPACING = 1.05em
+#let PAR-LEADING = SPACING
 #let PAGE-NUMBERING = "1"
 #let LONG-DASH = [---]
 #let LIST-DOT = [.]
@@ -22,14 +23,14 @@
   // Отступы от краев страницы
   margin: MARGIN,
   // Нумерация на страницах
-  numbering: PAGE-NUMBERING,
+  numbering: PAGE-NUMBERING
 )
 
 // Настройка текста
 #set text(
   size: TEXT-SIZE,
   lang: LANG,
-  hyphenate: HYPHENATE,
+  hyphenate: HYPHENATE
 )
 
 // Настройка абзацев
@@ -37,9 +38,10 @@
   justify: JUSTIFY,
   first-line-indent: (
     amount: INDENT,
-    all: true,
+    all: true
   ),
-  spacing: LEADING,
+  spacing: SPACING,
+  leading: PAR-LEADING
 )
 
 // Содержание
@@ -65,7 +67,7 @@
 #show figure.where(kind: image): set figure(supplement: [Рисунок])
 
 #show figure.where(
-  kind: table,
+  kind: table
 ): it => {
   set block(breakable: true)
   set figure.caption(position: top)
@@ -78,7 +80,7 @@
 #show list: it => {
   set par(justify: true, first-line-indent: (
     amount: INDENT,
-    all: true,
+    all: true
   ))
   
   let counter = 0
@@ -95,7 +97,7 @@
 #show enum: it => {
   set par(justify: true, first-line-indent: (
     amount: INDENT,
-    all: true,
+    all: true
   ))
   
   let counter = 0
@@ -118,12 +120,11 @@
 #let structural-heading-titles = (
   performers: [СПИСОК ИСПОЛНИТЕЛЕЙ],
   abstract: [РЕФЕРАТ],
-  // contents: [СОДЕРЖАНИЕ],
   terms: [ТЕРМИНЫ И ОПРЕДЕЛЕНИЯ],
   abbreviations: [ПЕРЕЧЕНЬ СОКРАЩЕНИЙ И ОБОЗНАЧЕНИЙ],
   intro: [ВВЕДЕНИЕ],
   conclusion: [ЗАКЛЮЧЕНИЕ],
-  references: [СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ],
+  references: [СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ]
 )
 
 #let structure-heading-style = it => {
@@ -166,8 +167,9 @@
   }
   body
 }
-#show heading.where(level: 2): set block(above: LEADING, below: LEADING)
-#show heading.where(level: 3): set block(above: LEADING, below: LEADING)
+#show heading.where(level: 1): set block(above: PAR-LEADING, below: PAR-LEADING)
+#show heading.where(level: 2): set block(above: PAR-LEADING, below: PAR-LEADING)
+#show heading.where(level: 3): set block(above: PAR-LEADING, below: PAR-LEADING)
 
 #show: headings(TEXT-SIZE, INDENT, true)
 
@@ -211,7 +213,7 @@
           )
         ),
         supplement: none,
-        caption: caption-text,
+        caption: caption-text
       )
     }
     
@@ -223,7 +225,7 @@
       let start_y = here().position().y
       // Измеряем высоту одной строки
       let line-height = measure(
-        block(height: TEXT-SIZE + LISTING-ERROR-PAGINATION)[Тестовый текст],
+        block(height: TEXT-SIZE + LISTING-ERROR-PAGINATION)[Тестовый текст]
       ).height
       // Вычисляем примерное количество строк на странице
       let available-height = size.height - start_y
