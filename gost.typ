@@ -23,14 +23,14 @@
   // Отступы от краев страницы
   margin: MARGIN,
   // Нумерация на страницах
-  numbering: PAGE-NUMBERING
+  numbering: PAGE-NUMBERING,
 )
 
 // Настройка текста
 #set text(
   size: TEXT-SIZE,
   lang: LANG,
-  hyphenate: HYPHENATE
+  hyphenate: HYPHENATE,
 )
 
 // Настройка абзацев
@@ -38,10 +38,10 @@
   justify: JUSTIFY,
   first-line-indent: (
     amount: INDENT,
-    all: true
+    all: true,
   ),
   spacing: SPACING,
-  leading: PAR-LEADING
+  leading: PAR-LEADING,
 )
 
 // Содержание
@@ -67,7 +67,7 @@
 #show figure.where(kind: image): set figure(supplement: [Рисунок])
 
 #show figure.where(
-  kind: table
+  kind: table,
 ): it => {
   set block(breakable: true)
   set figure.caption(position: top)
@@ -80,35 +80,40 @@
 #show list: it => {
   set par(justify: true, first-line-indent: (
     amount: INDENT,
-    all: true
+    all: true,
   ))
   
-  let counter = 0
+  let flag = false
   for item in it.children {
-    if counter == 0 {
+    if flag == false {
       [---#h(LIST-INDENT)#item.body]
+      flag = true
     } else {
       [#h(INDENT)---#h(LIST-INDENT)#item.body]
     }
     [\ ]
-    counter += 1
   }
 }
 #show enum: it => {
   set par(justify: true, first-line-indent: (
     amount: INDENT,
-    all: true
+    all: true,
   ))
   
-  let counter = 0
+  let counter = 1
+  let flag = false
   for item in it.children {
-    if counter == 0 {
-      [#(counter + 1)#LIST-DOT#h(LIST-INDENT)#item.body]
+    if (item.has("number")) {
+      counter = item.number
+    }
+    if flag == false {
+      [#counter#LIST-DOT#h(LIST-INDENT)#item.body]
+      flag = true
     } else {
-      [#h(INDENT)#(counter + 1)#LIST-DOT#h(LIST-INDENT)#item.body]
+      [#h(INDENT)#counter#LIST-DOT#h(LIST-INDENT)#item.body]
     }
     [\ ]
-    counter = counter + 1
+    counter += 1
   }
 }
 
@@ -124,7 +129,7 @@
   abbreviations: [ПЕРЕЧЕНЬ СОКРАЩЕНИЙ И ОБОЗНАЧЕНИЙ],
   intro: [ВВЕДЕНИЕ],
   conclusion: [ЗАКЛЮЧЕНИЕ],
-  references: [СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ]
+  references: [СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ],
 )
 
 #let structure-heading-style = it => {
@@ -213,7 +218,7 @@
           )
         ),
         supplement: none,
-        caption: caption-text
+        caption: caption-text,
       )
     }
     
@@ -225,7 +230,7 @@
       let start_y = here().position().y
       // Измеряем высоту одной строки
       let line-height = measure(
-        block(height: TEXT-SIZE + LISTING-ERROR-PAGINATION)[Тестовый текст]
+        block(height: TEXT-SIZE + LISTING-ERROR-PAGINATION)[Тестовый текст],
       ).height
       // Вычисляем примерное количество строк на странице
       let available-height = size.height - start_y
@@ -263,4 +268,4 @@
   }
 }
 
-#context(counter(page).update(START-PAGE))
+#context (counter(page).update(START-PAGE))
