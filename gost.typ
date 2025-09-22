@@ -179,9 +179,9 @@
 #show: headings(TEXT-SIZE, INDENT, true)
 
 // Листинг
+// Листинг с поддержкой ссылок
 #let listing-counter = counter("listing")
-
-#let listing(title, code-content) = {
+#let listing(title, code-content, label: none) = {
   // Увеличиваем счетчик листингов
   listing-counter.step()
   
@@ -193,14 +193,14 @@
     let code-lines = code-content.text.split("\n")
     
     // Функция для создания таблицы с кодом
-    let create-listing-table(lines, is-continuation: false) = {
+    let create-listing-table(lines, is-continuation: false, table-label: none) = {
       let caption-text = if is-continuation {
         [Продолжение листинга #listing-num]
       } else {
         [Листинг #listing-num --- #title]
       }
       
-      figure(
+      let fig = figure(
         table(
           columns: 1fr,
           stroke: 0.5pt,
@@ -220,6 +220,13 @@
         supplement: none,
         caption: caption-text,
       )
+      
+      // Применяем label если он есть
+      if table-label != none and is-continuation == false {
+        [#fig #table-label]
+      } else {
+        fig
+      }
     }
     
     // Вычисляем количество строк, которое помещается на странице
@@ -236,15 +243,21 @@
       let available-height = size.height - start_y
       let lines-per-page = calc.max(1, calc.floor(available-height / line-height)) + 2
       let is-continious = false
+      let page-count = 0
+      
       for line in code-lines {
         current-page.push(line)
         
         if current-page.len() >= lines-per-page {
           pages.push(current-page)
+          page-count += 1
           if pages.len() > 1 {
             is-continious = true
           }
-          create-listing-table(current-page.join("\n"), is-continuation: is-continious)
+          
+          // Присваиваем label только первой части листинга
+          let current-label = if page-count == 1 and label != none { label } else { none }
+          create-listing-table(current-page.join("\n"), is-continuation: is-continious, table-label: current-label)
           
           current-page = ()
           start_y = 0pt
@@ -257,15 +270,21 @@
       // Добавляем последнюю страницу, если она не пустая
       if current-page.len() > 0 {
         pages.push(current-page)
+        page-count += 1
         if pages.len() == 1 {
           is-continious = false
         } else {
           is-continious = true
         }
-        create-listing-table(current-page.join("\n"), is-continuation: is-continious)
+        
+        // Присваиваем label только если это единственная или первая часть
+        let current-label = if page-count == 1 and label != none { label } else { none }
+        create-listing-table(current-page.join("\n"), is-continuation: is-continious, table-label: current-label)
       }
     })
   }
 }
 
 #context (counter(page).update(START-PAGE))
+
+// --------------------------ТЕСТОВОЕ СОДЕРЖАНИЕ ДОКУМЕНТА-------------------------------
