@@ -23,14 +23,14 @@
   // Отступы от краев страницы
   margin: MARGIN,
   // Нумерация на страницах
-  numbering: PAGE-NUMBERING,
+  numbering: PAGE-NUMBERING
 )
 
 // Настройка текста
 #set text(
   size: TEXT-SIZE,
   lang: LANG,
-  hyphenate: HYPHENATE,
+  hyphenate: HYPHENATE
 )
 
 // Настройка абзацев
@@ -38,10 +38,10 @@
   justify: JUSTIFY,
   first-line-indent: (
     amount: INDENT,
-    all: true,
+    all: true
   ),
   spacing: SPACING,
-  leading: PAR-LEADING,
+  leading: PAR-LEADING
 )
 
 // Содержание
@@ -67,7 +67,7 @@
 #show figure.where(kind: image): set figure(supplement: [Рисунок])
 
 #show figure.where(
-  kind: table,
+  kind: table
 ): it => {
   set block(breakable: true)
   set figure.caption(position: top)
@@ -80,7 +80,7 @@
 #show list: it => {
   set par(justify: true, first-line-indent: (
     amount: INDENT,
-    all: true,
+    all: true
   ))
   
   let flag = false
@@ -97,7 +97,7 @@
 #show enum: it => {
   set par(justify: true, first-line-indent: (
     amount: INDENT,
-    all: true,
+    all: true
   ))
   
   let counter = 1
@@ -129,7 +129,7 @@
   abbreviations: [ПЕРЕЧЕНЬ СОКРАЩЕНИЙ И ОБОЗНАЧЕНИЙ],
   intro: [ВВЕДЕНИЕ],
   conclusion: [ЗАКЛЮЧЕНИЕ],
-  references: [СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ],
+  references: [СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ]
 )
 
 #let structure-heading-style = it => {
@@ -218,7 +218,7 @@
           )
         ),
         supplement: none,
-        caption: caption-text,
+        caption: caption-text
       )
       
       // Применяем label если он есть
@@ -237,7 +237,7 @@
       let start_y = here().position().y
       // Измеряем высоту одной строки
       let line-height = measure(
-        block(height: TEXT-SIZE + LISTING-ERROR-PAGINATION)[Тестовый текст],
+        block(height: TEXT-SIZE + LISTING-ERROR-PAGINATION)[Тестовый текст]
       ).height
       // Вычисляем примерное количество строк на странице
       let available-height = size.height - start_y
@@ -281,10 +281,11 @@
         let current-label = if page-count == 1 and label != none { label } else { none }
         create-listing-table(current-page.join("\n"), is-continuation: is-continious, table-label: current-label)
       }
+      counter(figure.where(kind: table)).update(n => n + 1 - page-count)
     })
   }
 }
 
-#context (counter(page).update(START-PAGE))
+#context(counter(page).update(START-PAGE))
 
 // --------------------------ТЕСТОВОЕ СОДЕРЖАНИЕ ДОКУМЕНТА-------------------------------
