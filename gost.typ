@@ -103,7 +103,7 @@
   let counter = 1
   let flag = false
   for item in it.children {
-    if (item.has("number")) {
+    if (item.has("number") and item.number != auto) {
       counter = item.number
     }
     if flag == false {
@@ -288,4 +288,4 @@
 
 #context(counter(page).update(START-PAGE))
 
-// --------------------------ТЕСТОВОЕ СОДЕРЖАНИЕ ДОКУМЕНТА-------------------------------
+#let nothing = text(scale(x: -100%)[#move(dy: -0.08em)[$nothing.rev$]]) // корректный символ пустого множества
