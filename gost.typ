@@ -288,6 +288,39 @@
 
 #context(counter(page).update(START-PAGE))
 
-#let nothing = text(scale(x: -100%)[#move(dy: -0.08em)[$nothing.rev$]]) // корректный символ пустого множества
+#let co = math.class( // запятая с корректными отступами
+  "punctuation",
+  $op(", ", limits: #false)$
+)
+
+#let counter1 = counter("level-2")
+#let counter2 = counter("level-3")
+#let smart-heading(level, body, num: auto) = {
+  if level == 2 {
+    if num == auto {
+      counter1.step()
+    }
+    else {
+      counter1.update(num)
+    }
+    counter2.update(0)
+  } else if level == 3 {
+    if num == auto {
+      counter2.step()
+    }
+    else {
+      counter2.update(num)
+    }
+  }
+  context {
+    if level == 2 {
+      heading(level: level)[#body #counter1.get().at(0)]
+    } else if level == 3 {
+      heading(level: level)[#body #counter2.get().at(0)]
+    }
+  }
+}
+
+#let nothing = text(scale(x: -100%)[#move(dy: -0.08em)[$nothing.rev$]])
 
 // --------------------------ТЕСТОВОЕ СОДЕРЖАНИЕ ДОКУМЕНТА--------------------------
