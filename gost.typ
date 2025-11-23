@@ -1,11 +1,11 @@
-#set text(font: "Times New Roman")
+#let FONT = "Times New Roman"
 
 // Константы
 #let START-PAGE = 2
 #let MARGIN = (left: 30mm, right: 15mm, top: 20mm, bottom: 20mm)
 #let TEXT-SIZE = 14pt
-#let LISTING-ERROR-PAGINATION = 0.24em // подобрано для размера шрифта от 13 до 18pt вкл.
 #let INDENT = 1.25cm
+#let GAP = 0.65em
 #let LANG = "ru"
 #let HYPHENATE = false
 #let JUSTIFY = true
@@ -32,6 +32,10 @@
   lang: LANG,
   hyphenate: HYPHENATE
 )
+
+#set text(font: FONT)
+#show raw: set text(font: FONT, size: TEXT-SIZE)
+#show raw: set par(leading: LEADING)
 
 // Настройка абзацев
 #set par(
@@ -64,6 +68,7 @@
 #set math.equation(numbering: "(1)")
 
 #show image: set align(center)
+#set figure(gap: GAP)
 #show figure.where(kind: image): set figure(supplement: [Рисунок])
 
 #show figure.where(
@@ -181,7 +186,17 @@
 // Листинг
 // Листинг с поддержкой ссылок
 #let listing-counter = counter("listing")
-#let listing(title, code-content, label: none) = {
+#let listing(title, code-content, label: none,
+cor0: 0pt,
+cor1: 0pt,
+cor2: 0pt,
+cor3: 0pt,
+cor4: 0pt,
+cor5: 0pt,
+cor6: 0pt,
+cor7: 0pt,
+cor8: 0pt,
+cor9: 0pt) = {
   // Увеличиваем счетчик листингов
   listing-counter.step()
   
@@ -229,69 +244,86 @@
       }
     }
     
-    // Вычисляем количество строк, которое помещается на странице
-    layout(size => {
-      // Разбиваем код на страницы
-      let pages = ()
-      let current-page = ()
-      let start_y = here().position().y
-      // Измеряем высоту одной строки
-      let line-height = measure(
-        block(height: TEXT-SIZE + LISTING-ERROR-PAGINATION)[Тестовый текст]
-      ).height
-      // Вычисляем примерное количество строк на странице
-      let available-height = size.height - start_y
-      let lines-per-page = calc.max(1, calc.floor(available-height / line-height)) + 2
-      let is-continious = false
-      let page-count = 0
+    let pages = ()
+    let current-page = ()
+    let start_y = here().position().y
+    let is-continious = false
+    let page-count = 0
+    
+    for line in code-lines {
+      current-page.push(line)
       
-      for line in code-lines {
-        current-page.push(line)
-        
-        if current-page.len() >= lines-per-page {
-          pages.push(current-page)
-          page-count += 1
-          if pages.len() > 1 {
-            is-continious = true
-          }
-          
-          // Присваиваем label только первой части листинга
-          let current-label = if page-count == 1 and label != none { label } else { none }
-          create-listing-table(current-page.join("\n"), is-continuation: is-continious, table-label: current-label)
-          
-          current-page = ()
-          start_y = 0pt
-          
-          available-height = size.height - start_y
-          lines-per-page = calc.max(1, calc.floor(available-height / line-height))
-        }
+      // Правильно используем measure с width (ГЛАВНАЯ ИДЕЯ)
+      let height
+      (height,) = measure(
+        width: page.width,
+        create-listing-table(
+          current-page.join("\n"), 
+          is-continuation: is-continious
+        )
+      )
+
+      let cor
+      if page-count == 0 {
+        cor = cor0
+      } else if page-count == 1 {
+        cor = cor1
+      } else if page-count == 2 {
+        cor = cor2
+      } else if page-count == 3 {
+        cor = cor3
+      } else if page-count == 4 {
+        cor = cor4
+      } else if page-count == 5 {
+        cor = cor5
+      } else if page-count == 6 {
+        cor = cor6
+      } else if page-count == 7 {
+        cor = cor7
+      } else if page-count == 8 {
+        cor = cor8
+      } else {
+        cor = cor9
       }
       
-      // Добавляем последнюю страницу, если она не пустая
-      if current-page.len() > 0 {
+      if start_y + height >= page.height - page.margin.bottom.length - TEXT-SIZE - LEADING.to-absolute() - cor {
         pages.push(current-page)
         page-count += 1
-        if pages.len() == 1 {
-          is-continious = false
-        } else {
+        if pages.len() > 1 {
           is-continious = true
         }
         
-        // Присваиваем label только если это единственная или первая часть
+        // Присваиваем label только первой части листинга
         let current-label = if page-count == 1 and label != none { label } else { none }
-        create-listing-table(current-page.join("\n"), is-continuation: is-continious, table-label: current-label)
+        create-listing-table(
+          current-page.join("\n"),
+          is-continuation: is-continious, 
+          table-label: current-label
+        )
+        current-page = ()
+        start_y = page.margin.top.length
       }
-      counter(figure.where(kind: table)).update(n => n + 1 - page-count)
-    })
+    }
+      
+    // Добавляем последнюю страницу, если она не пустая
+    if current-page.len() > 0 {
+      pages.push(current-page)
+      page-count += 1
+      if pages.len() == 1 {
+        is-continious = false
+      } else {
+        is-continious = true
+      }
+      
+      // Присваиваем label только если это единственная или первая часть
+      let current-label = if page-count == 1 and label != none { label } else { none }
+      create-listing-table(current-page.join("\n"), is-continuation: is-continious, table-label: current-label)
+    }
+    counter(figure.where(kind: table)).update(n => n + 1 - page-count)
   }
 }
 
 #context(counter(page).update(START-PAGE))
-
-#let co = math.class( // запятая с корректными отступами
-  "punctuation",
-  $op(", ", limits: #false)$
-)
 
 #let counter1 = counter("level-2")
 #let counter2 = counter("level-3")
@@ -321,6 +353,11 @@
   }
 }
 
-#let nothing = text(scale(x: -100%)[#move(dy: -0.08em)[$nothing.rev$]])
+#let co = math.class( // запятая с корректными отступами
+  "punctuation",
+  $op(", ", limits: #false)$
+)
+
+#let nothing = text(scale(x: -100%)[#move(dy: -0.08em)[$nothing.rev$]]) // корректный символ пустого множества
 
 // --------------------------ТЕСТОВОЕ СОДЕРЖАНИЕ ДОКУМЕНТА--------------------------
