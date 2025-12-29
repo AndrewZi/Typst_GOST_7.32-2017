@@ -18,6 +18,7 @@
 #let LEADING = leading - 0.75em // Normalization
 #let LIST-INDENT = 0.25cm
 #let listing-kind = "listing"
+#let appendix-names = ("А", "Б", "В", "Г", "Д", "Е", "Ж", "И", "К", "Л", "М", "Н", "П", "Р", "С", "Т", "У", "Ф", "Х", "Ц", "Ш", "Щ", "Э", "Ю", "Я")
 
 // Настройка отображения листингов
 #show figure.where(kind: listing-kind): set figure(supplement: [Листинг])
@@ -141,6 +142,106 @@
   references: [СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ]
 )
 
+// Состояние для приложений
+#let in-appendix = state("in-appendix", false)
+#let current-appendix-letter = state("current-appendix-letter", "")
+
+// Кастомная функция нумерации для фигур в приложениях
+#let appendix-numbering(it) = context {
+  if in-appendix.get() {
+    let letter = current-appendix-letter.get()
+    letter + "." + str(it)
+  } else {
+    str(it)
+  }
+}
+
+// Создаем счетчик для приложений
+#let appendix-counter = counter("appendix")
+
+#let number-to-appendix-letter(n) = {
+  appendix-names.at(n - 1)
+}
+
+// Функция для создания приложения (с автоматической буквой)
+#let appendix(body) = context {
+  set par(first-line-indent: (
+    amount: 0pt,
+    all: true
+  ))
+  set align(center)
+  // Увеличиваем счетчик приложений
+  appendix-counter.step()
+  
+  // Получаем текущую букву
+  let letter = number-to-appendix-letter(appendix-counter.get().first())
+  
+  {
+    align(center)[
+      #heading(numbering: none, outlined: false, level: 1)[
+        #h(-INDENT)ПРИЛОЖЕНИЕ #letter
+      ]
+    ]
+    show heading.where(level: 1): it => {}
+    hide(heading(numbering: none, outlined: true, level: 1)[ПРИЛОЖЕНИЕ #letter])
+  }
+  
+  // Устанавливаем состояние приложения
+  
+  in-appendix.update(true)
+  current-appendix-letter.update(letter)
+  
+  // Сбрасываем и настраиваем счетчики фигур
+  counter(figure.where(kind: image)).update(0)
+  counter(figure.where(kind: table)).update(0)
+  counter(figure.where(kind: listing-kind)).update(0)
+  
+  // Применяем все стили к содержимому приложения
+  {
+    // Устанавливаем кастомную нумерацию для фигур
+    set figure(numbering: appendix-numbering)
+    
+    // Применяем позицию caption для таблиц и листингов
+    show figure.where(kind: table).or(figure.where(kind: listing-kind)): set figure.caption(position: top)
+    
+    // Применяем выравнивание для ячеек таблиц
+    show table.cell: set align(left)
+    
+    // Модифицируем caption для изменения supplement и выравнивания
+    show figure.caption: it => context {
+      if in-appendix.get() {
+        let letter = current-appendix-letter.get()
+        
+        // Проверяем, является ли это листингом из функции listing
+        if it.supplement == none {
+          // Это листинг из функции listing, применяем выравнивание влево
+          align(left, it.body)
+        } else {
+          // Это обычная фигура (image/table), добавляем supplement и выравнивание
+          let supplement-text = if it.kind == image {
+            "Рисунок"
+          } else if it.kind == table {
+            "Таблица"
+          } else if it.kind == listing-kind {
+            "Листинг"
+          } else {
+            it.supplement
+          }
+          
+          align(center, [#supplement-text #it.counter.display(it.numbering) #it.separator #it.body])
+        }
+      } else {
+        it
+      }
+    }
+    body
+  }
+  
+  // Выходим из режима приложения
+  in-appendix.update(false)
+  current-appendix-letter.update("")
+}
+
 #let structure-heading-style = it => {
   align(center)[#upper(it)]
 }
@@ -160,7 +261,7 @@
       it
     }
   }
-  
+
   show heading.where(level: 1): it => {
     if pagebreaks {
       pagebreak(weak: true)
@@ -187,9 +288,7 @@
 
 #show: headings(TEXT-SIZE, INDENT, true)
 
-// Листинг
 // Листинг с поддержкой ссылок
-#let listing-counter = counter("listing")
 #let listing(title, code-content, label: none,
 cor0: 0pt,
 cor1: 0pt,
@@ -201,12 +300,23 @@ cor6: 0pt,
 cor7: 0pt,
 cor8: 0pt,
 cor9: 0pt) = {
-  // Увеличиваем счетчик листингов
-  listing-counter.step()
+  // Используем стандартный счетчик фигур для листингов
+  counter(figure.where(kind: listing-kind)).step()
   
   context {
-    // Получаем номер текущего листинга
-    let listing-num = listing-counter.get().first()
+    // Получаем номер текущего листинга из стандартного счетчика
+    let listing-num = counter(figure.where(kind: listing-kind)).get().first()
+    
+    // Проверяем, находимся ли в приложении
+    let is-in-appendix = in-appendix.get()
+    let app-letter = if is-in-appendix { current-appendix-letter.get() } else { "" }
+    
+    // Формируем номер листинга с учетом приложения
+    let listing-display = if is-in-appendix {
+      [#app-letter.#listing-num]
+    } else {
+      str(listing-num)
+    }
     
     // Разбиваем код на строки
     let code-lines = code-content.text.split("\n")
@@ -214,9 +324,9 @@ cor9: 0pt) = {
     // Функция для создания таблицы с кодом
     let create-listing-table(lines, is-continuation: false, table-label: none) = {
       let caption-text = if is-continuation {
-        [Продолжение листинга #listing-num]
+        [Продолжение листинга #listing-display]
       } else {
-        [Листинг #listing-num --- #title]
+        [Листинг #listing-display --- #title]
       }
       
       let fig = figure(
@@ -258,7 +368,6 @@ cor9: 0pt) = {
     for line in code-lines {
       current-page.push(line)
       
-      // Правильно используем measure с width (ГЛАВНАЯ ИДЕЯ)
       let height
       (height,) = measure(
         width: page.width,
@@ -298,7 +407,6 @@ cor9: 0pt) = {
           is-continious = true
         }
         
-        // Присваиваем label только первой части листинга
         let current-label = if page-count == 1 and label != none { label } else { none }
         create-listing-table(
           current-page.join("\n"),
@@ -310,7 +418,6 @@ cor9: 0pt) = {
       }
     }
       
-    // Добавляем последнюю страницу, если она не пустая
     if current-page.len() > 0 {
       pages.push(current-page)
       page-count += 1
@@ -320,14 +427,12 @@ cor9: 0pt) = {
         is-continious = true
       }
       
-      // Присваиваем label только если это единственная или первая часть
       let current-label = if page-count == 1 and label != none { label } else { none }
       create-listing-table(current-page.join("\n"), is-continuation: is-continious, table-label: current-label)
     }
     counter(figure.where(kind: listing-kind)).update(n => n + 1 - page-count)
   }
 }
-
 #context(counter(page).update(START-PAGE))
 
 #let counter1 = counter("level-2")
