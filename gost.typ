@@ -17,6 +17,11 @@
 #let leading = 1.5em
 #let LEADING = leading - 0.75em // Normalization
 #let LIST-INDENT = 0.25cm
+#let listing-kind = "listing"
+
+// Настройка отображения листингов
+#show figure.where(kind: listing-kind): set figure(supplement: [Листинг])
+#show figure.where(kind: listing-kind): set figure.caption(position: top)
 
 // Настройка страницы
 #set page(
@@ -71,14 +76,13 @@
 #set figure(gap: GAP)
 #show figure.where(kind: image): set figure(supplement: [Рисунок])
 
-#show figure.where(
-  kind: table
-): it => {
+// Общие стили для таблиц И листингов
+#show figure.where(kind: table).or(figure.where(kind: listing-kind)): it => {
   set block(breakable: true)
   set figure.caption(position: top)
   it
 }
-#show figure.caption.where(kind: table): set align(left)
+#show figure.caption.where(kind: table).or(figure.caption.where(kind: listing-kind)): set align(left)
 #show table.cell: set align(left)
 
 // Списки (ненумерованный и нумерованный)
@@ -216,6 +220,7 @@ cor9: 0pt) = {
       }
       
       let fig = figure(
+        kind: listing-kind,
         table(
           columns: 1fr,
           stroke: 0.5pt,
@@ -319,7 +324,7 @@ cor9: 0pt) = {
       let current-label = if page-count == 1 and label != none { label } else { none }
       create-listing-table(current-page.join("\n"), is-continuation: is-continious, table-label: current-label)
     }
-    counter(figure.where(kind: table)).update(n => n + 1 - page-count)
+    counter(figure.where(kind: listing-kind)).update(n => n + 1 - page-count)
   }
 }
 
