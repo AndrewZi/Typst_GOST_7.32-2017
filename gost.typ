@@ -175,19 +175,17 @@
   
   // Получаем текущую букву
   let letter = number-to-appendix-letter(appendix-counter.get().first())
+
+  pagebreak()
+  place(top, hide(heading(numbering: none, outlined: true, level: 1)[ПРИЛОЖЕНИЕ #letter]))
   
-  {
-    align(center)[
-      #heading(numbering: none, outlined: false, level: 1)[
-        #h(-INDENT)ПРИЛОЖЕНИЕ #letter
-      ]
+  align(center)[
+    #heading(numbering: none, outlined: false, level: 1)[
+      #h(-INDENT)ПРИЛОЖЕНИЕ #letter
     ]
-    show heading.where(level: 1): it => {}
-    hide(heading(numbering: none, outlined: true, level: 1)[ПРИЛОЖЕНИЕ #letter])
-  }
+  ]
   
   // Устанавливаем состояние приложения
-  
   in-appendix.update(true)
   current-appendix-letter.update(letter)
   
@@ -263,8 +261,8 @@
   }
 
   show heading.where(level: 1): it => {
-    if pagebreaks {
-      pagebreak(weak: true)
+    if pagebreaks == true and in-appendix == false {
+      pagebreak()
     }
     it
   }
@@ -276,7 +274,7 @@
   show structural-heading: set heading(numbering: none)
   show structural-heading: it => {
     if pagebreaks {
-      pagebreak(weak: true)
+      pagebreak()
     }
     structure-heading-style(it)
   }
@@ -306,7 +304,6 @@ cor9: 0pt) = {
   context {
     // Получаем номер текущего листинга из стандартного счетчика
     let listing-num = counter(figure.where(kind: listing-kind)).get().first()
-    
     // Проверяем, находимся ли в приложении
     let is-in-appendix = in-appendix.get()
     let app-letter = if is-in-appendix { current-appendix-letter.get() } else { "" }
