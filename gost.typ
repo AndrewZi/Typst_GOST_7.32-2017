@@ -54,17 +54,24 @@
   leading: PAR-LEADING
 )
 
+// Состояние для приложений
+#let in-appendix = state("in-appendix", true)
+
 // Содержание
 #set outline(indent: INDENT, depth: 3, title: text(size: TEXT-SIZE, upper[содержание]))
 
 #show outline: set block(below: INDENT / 2)
+#show outline: it => {
+  it
+  in-appendix.update(false)
+}
+
 #show outline.entry: it => {
   show linebreak: [ ]
   it
 }
 
 #show outline: set align(center)
-
 
 // Ссылки через @
 #set ref(supplement: none)
@@ -142,8 +149,6 @@
   references: [СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ]
 )
 
-// Состояние для приложений
-#let in-appendix = state("in-appendix", false)
 #let current-appendix-letter = state("current-appendix-letter", "")
 
 // Кастомная функция нумерации для фигур в приложениях
@@ -261,7 +266,7 @@
   }
 
   show heading.where(level: 1): it => {
-    if pagebreaks == true and in-appendix == false {
+    if pagebreaks == true and in-appendix.get() == false {
       pagebreak()
     }
     it
