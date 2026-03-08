@@ -61,6 +61,7 @@
 #set outline(indent: INDENT, depth: 3, title: text(size: TEXT-SIZE, upper[содержание]))
 
 #show outline: set block(below: INDENT / 2)
+
 #show outline: it => {
   it
   in-appendix.update(false)
@@ -169,7 +170,7 @@
 }
 
 // Функция для создания приложения (с автоматической буквой)
-#let appendix(body) = context {
+#let appendix(body) = { context {
   set par(first-line-indent: (
     amount: 0pt,
     all: true
@@ -180,12 +181,9 @@
   
   // Получаем текущую букву
   let letter = number-to-appendix-letter(appendix-counter.get().first())
-
-  pagebreak()
-  place(top, hide(heading(numbering: none, outlined: true, level: 1)[ПРИЛОЖЕНИЕ #letter]))
   
   align(center)[
-    #heading(numbering: none, outlined: false, level: 1)[
+    #heading(numbering: none, outlined: true, level: 1)[
       #h(-INDENT)ПРИЛОЖЕНИЕ #letter
     ]
   ]
@@ -234,7 +232,8 @@
           align(center, [#supplement-text #it.counter.display(it.numbering) #it.separator #it.body])
         }
       } else {
-        it
+          it
+        }
       }
     }
     body
@@ -278,9 +277,6 @@
   
   show structural-heading: set heading(numbering: none)
   show structural-heading: it => {
-    if pagebreaks {
-      pagebreak()
-    }
     structure-heading-style(it)
   }
   body
@@ -304,11 +300,9 @@ cor7: 0pt,
 cor8: 0pt,
 cor9: 0pt) = {
   // Используем стандартный счетчик фигур для листингов
-  counter(figure.where(kind: listing-kind)).step()
-  
   context {
     // Получаем номер текущего листинга из стандартного счетчика
-    let listing-num = counter(figure.where(kind: listing-kind)).get().first()
+    let listing-num = counter(figure.where(kind: listing-kind)).get().first() + 1
     // Проверяем, находимся ли в приложении
     let is-in-appendix = in-appendix.get()
     let app-letter = if is-in-appendix { current-appendix-letter.get() } else { "" }
@@ -432,7 +426,8 @@ cor9: 0pt) = {
       let current-label = if page-count == 1 and label != none { label } else { none }
       create-listing-table(current-page.join("\n"), is-continuation: is-continious, table-label: current-label)
     }
-    counter(figure.where(kind: listing-kind)).update(n => n + 1 - page-count)
+    counter(figure.where(kind: listing-kind)).update(n => n - page-count)
+    counter(figure.where(kind: listing-kind)).step()
   }
 }
 #context(counter(page).update(START-PAGE))
