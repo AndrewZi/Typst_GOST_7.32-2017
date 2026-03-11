@@ -58,9 +58,7 @@
 
 // Содержание
 #set outline(indent: INDENT, depth: 3, title: text(size: TEXT-SIZE, upper[содержание]))
-
 #show outline: set block(below: INDENT / 2)
-
 #show outline: it => {
   it
   in-appendix.update(false)
@@ -180,9 +178,12 @@
   
   // Получаем текущую букву
   let letter = number-to-appendix-letter(appendix-counter.get().first())
-  
   align(center)[
-    #heading(numbering: none, outlined: true, level: 1)[
+    #heading(numbering: none, outlined: false, level: 1)[
+      #{
+        show heading: none
+        heading(level: 1, numbering: none)[ПРИЛОЖЕНИЕ #letter]
+      }
       #h(-INDENT)ПРИЛОЖЕНИЕ #letter
     ]
   ]
@@ -430,7 +431,6 @@ cor9: 0pt) = {
   }
 }
 #context(counter(page).update(START-PAGE))
-
 #let counter1 = counter("level-2")
 #let counter2 = counter("level-3")
 
