@@ -9,13 +9,13 @@
 #let LANG = "ru"
 #let HYPHENATE = false
 #let JUSTIFY = true
-#let SPACING = 1.05em
-#let PAR-LEADING = SPACING
 #let PAGE-NUMBERING = "1"
 #let LONG-DASH = [---]
 #let LIST-DOT = [.]
 #let leading = 1.5em
-#let LEADING = leading - 0.75em // Нормализация
+#let LEADING = leading - 0.45em // Нормализация
+#let PAR-LEADING = LEADING
+#let SPACING = LEADING
 #let LIST-INDENT = 0.25cm
 #let listing-kind = "listing"
 #let appendix-names = ("А", "Б", "В", "Г", "Д", "Е", "Ж", "И", "К", "Л", "М", "Н", "П", "Р", "С", "Т", "У", "Ф", "Х", "Ц", "Ш", "Щ", "Э", "Ю", "Я")
@@ -41,7 +41,6 @@
 
 #set text(font: FONT)
 #show raw: set text(font: FONT, size: TEXT-SIZE)
-#show raw: set par(leading: LEADING)
 
 // Настройка абзацев
 #set par(
@@ -434,6 +433,7 @@ cor9: 0pt) = {
 
 #let counter1 = counter("level-2")
 #let counter2 = counter("level-3")
+
 #let smart-heading(level, body, num: auto) = {
   if level == 2 {
     if num == auto {
