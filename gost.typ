@@ -57,7 +57,9 @@
 #let in-appendix = state("in-appendix", true)
 
 // Содержание
-#set outline(indent: INDENT, depth: 3, title: text(size: TEXT-SIZE, upper[содержание]))
+#set outline(indent: INDENT, depth: 3, title: context {text(size: TEXT-SIZE, upper[#h(
+  (page.width - MARGIN.left - 1.83 * MARGIN.right - measure(text(size: TEXT-SIZE, upper[содержание])).width) / 2
+)содержание])})
 #show outline: set block(below: INDENT / 2)
 #show outline: it => {
   it
@@ -68,8 +70,6 @@
   show linebreak: [ ]
   it
 }
-
-#show outline: set align(center)
 
 // Ссылки через @
 #set ref(supplement: none)
