@@ -284,7 +284,7 @@
 #show heading.where(level: 1): set block(above: PAR-LEADING, below: PAR-LEADING)
 #show heading.where(level: 2): set block(above: PAR-LEADING, below: PAR-LEADING)
 #show heading.where(level: 3): set block(above: PAR-LEADING, below: PAR-LEADING)
-
+#show heading.where(level: 3): set text(weight: "thin")
 #show: headings(TEXT-SIZE, INDENT, true)
 
 // Листинг с поддержкой ссылок
