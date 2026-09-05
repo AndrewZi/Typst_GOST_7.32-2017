@@ -292,10 +292,9 @@
     let listing-num = counter(figure.where(kind: listing-kind)).get().first() + 1
     let is-in-appendix = in-appendix.get()
     let app-letter = if is-in-appendix { current-appendix-letter.get() } else { "" }
-    let display = if is-in-appendix { app-letter + "." + str(listing-num) } else { str(listing-num) }
-    
+    let display = if is-in-appendix { app-letter + "." + str(listing-num) } else { str(listing-num) }    
     let first-page = counter(page).get().first()
-    
+
     let fig = figure(
       kind: listing-kind,
       supplement: [Листинг],
@@ -340,6 +339,47 @@
     } else {
       fig
     }
+  }
+}
+
+// Таблица с переносом по ГОСТ
+#let gost-table(caption, columns, header: (), body) = {
+  context {
+    let n = if type(columns) == array { columns.len() } else { 1 }
+    let tbl-num = counter(figure.where(kind: table)).get().first() + 1
+    let in-app = in-appendix.get()
+    let letter = if in-app { current-appendix-letter.get() } else { "" }
+    let display = if in-app { letter + "." + str(tbl-num) } else { str(tbl-num) }
+    let first-page = counter(page).get().first()
+
+    figure(
+      kind: table,
+      supplement: [Таблица],
+      table(
+        columns: columns,
+        stroke: 0.5pt,
+        inset: 4pt,
+        table.header(
+          repeat: true,
+          table.cell(
+            colspan: n,
+            stroke: none,
+            align: left,
+            inset: (left: 1pt, top: 1pt, bottom: LIST-INDENT),
+            context {
+              let here = counter(page).get().first()
+              if here == first-page {
+                [Таблица #display --- #caption]
+              } else {
+                [Продолжение таблицы #display]
+              }
+            },
+          ),
+          ..header,
+        ),
+        ..body,
+      ),
+    )
   }
 }
 
