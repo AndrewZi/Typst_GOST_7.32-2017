@@ -1,7 +1,7 @@
 #let FONT = "Times New Roman"
 
 // Константы
-#let START-PAGE = 2
+#let START-PAGE = 4
 #let MARGIN = (left: 30mm, right: 15mm, top: 20mm, bottom: 20mm)
 #let TEXT-SIZE = 14pt
 #let INDENT = 1.25cm
@@ -11,7 +11,7 @@
 #let JUSTIFY = true
 #let PAGE-NUMBERING = "1"
 #let LONG-DASH = [---]
-#let LIST-DOT = [.]
+#let LIST-DOT = [)]
 #let leading = 1.5em
 #let LEADING = leading - 0.45em // Нормализация
 #let PAR-LEADING = LEADING
@@ -75,7 +75,7 @@
 #set figure.caption(separator: " — ")
 
 // Нумерация математических формул
-#set math.equation(numbering: "(1)")
+#set math.equation(numbering: none)
 
 #show image: set align(center)
 #set figure(gap: GAP)
@@ -132,7 +132,7 @@
 }
 
 // Заголовки
-#set heading(numbering: "1.1.1.")
+#set heading(numbering: "1.1.1")
 
 #show heading: set text(size: TEXT-SIZE)
 
@@ -166,7 +166,7 @@
 }
 
 // Функция для создания приложения (с автоматической буквой)
-#let appendix(body) = { context {
+#let appendix(name: none, body) = { context {
   set par(first-line-indent: (
     amount: 0pt,
     all: true
@@ -181,9 +181,11 @@
     #heading(numbering: none, outlined: false, level: 1)[
       #{
         show heading: none
-        heading(level: 1, numbering: none)[ПРИЛОЖЕНИЕ #letter]
+        heading(level: 1, numbering: none)[ПРИЛОЖЕНИЕ #letter. #name]
       }
       #h(-INDENT)ПРИЛОЖЕНИЕ #letter
+      #align(center)[#text(size: TEXT-SIZE, weight: "regular")[#h(-INDENT)#name]]
+      #v(GAP)
     ]
   ]
   
@@ -253,7 +255,7 @@
 
 #let headings(text-size, indent, pagebreaks) = body => {
   show heading: set text(size: text-size)
-  set heading(numbering: "1.1.1.")
+  set heading(numbering: "1.1.1")
   
   show heading: it => {
     if it.body not in structural-heading-titles.values() {
@@ -262,14 +264,12 @@
       it
     }
   }
-
   show heading.where(level: 1): it => {
     if pagebreaks == true and in-appendix.get() == false {
       pagebreak()
     }
     it
   }
-  
   let structural-heading = structural-heading-titles
     .values()
     .fold(selector, (acc, i) => acc.or(heading.where(body: i, level: 1)))
