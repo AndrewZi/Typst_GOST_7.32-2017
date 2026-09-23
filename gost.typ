@@ -67,7 +67,9 @@
 }
 #show outline.entry: it => {
   show linebreak: [ ]
-  it
+  let prefix = it.prefix()
+  let inner = if prefix == none { it.inner() } else { prefix + h(0.5em) + it.inner() }
+  link(it.element.location(), it.indented(none, inner))
 }
 
 // Ссылки через @
@@ -132,9 +134,9 @@
 }
 
 // Заголовки
-#set heading(numbering: "1.1.1")
+#set heading(numbering: "1.1.1", hanging-indent: 0pt)
 
-#show heading: set text(size: TEXT-SIZE)
+#show heading: set text(size: TEXT-SIZE, hyphenate: false)
 
 #let structural-heading-titles = (
   performers: [СПИСОК ИСПОЛНИТЕЛЕЙ],
@@ -255,7 +257,7 @@
 
 #let headings(text-size, indent, pagebreaks) = body => {
   show heading: set text(size: text-size)
-  set heading(numbering: "1.1.1")
+  set heading(numbering: "1.1.1", hanging-indent: 0pt)
   
   show heading: it => {
     if it.body not in structural-heading-titles.values() {
@@ -273,7 +275,6 @@
   let structural-heading = structural-heading-titles
     .values()
     .fold(selector, (acc, i) => acc.or(heading.where(body: i, level: 1)))
-  
   show structural-heading: set heading(numbering: none)
   show structural-heading: it => {
     structure-heading-style(it)
@@ -333,7 +334,6 @@
         )
       )
     )
-    
     if label != none {
       [#fig #label]
     } else {
