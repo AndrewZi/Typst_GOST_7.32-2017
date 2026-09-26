@@ -1,7 +1,7 @@
 #let FONT = "Times New Roman"
 
 // Константы
-#let START-PAGE = 4
+#let START-PAGE = 2
 #let MARGIN = (left: 30mm, right: 15mm, top: 20mm, bottom: 20mm)
 #let TEXT-SIZE = 14pt
 #let INDENT = 1.25cm
