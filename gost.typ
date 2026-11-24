@@ -257,7 +257,13 @@
 
 #let headings(text-size, indent, pagebreaks) = body => {
   show heading: set text(size: text-size)
-  set heading(numbering: "1.1.1", hanging-indent: 0pt)
+  set heading(numbering: "1.1.1", hanging-indent: -indent)
+
+  let non-indented-heading = structural-heading-titles.values().fold(
+    heading.where(level: 1, numbering: none, outlined: false),
+    (acc, i) => acc.or(heading.where(body: i))
+  )
+  show non-indented-heading: set heading(hanging-indent: 0pt)
   
   show heading: it => {
     if it.body not in structural-heading-titles.values() {
@@ -351,7 +357,6 @@
     let letter = if in-app { current-appendix-letter.get() } else { "" }
     let display = if in-app { letter + "." + str(tbl-num) } else { str(tbl-num) }
     let first-page = counter(page).get().first()
-
     figure(
       kind: table,
       supplement: [Таблица],
